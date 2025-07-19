@@ -3,7 +3,12 @@ An open source, self-hosted management tool that can serve as an alternative to 
 
 ## Technology Used
 
-`nodejs`, `express`, `socket.io`, `nextauth.js`, `next.js`, `mongoDB`, `tailwind CSS`
+### Frontend
+`nodejs`, `express`, `next.js`, `react`, `tailwind CSS`
+
+### Backend
+`firebase` is used for user login and authentication.
+`nodemon` is used to ensure auto refresh of the server whenever a change is saved.
 
 ## Installation
 
