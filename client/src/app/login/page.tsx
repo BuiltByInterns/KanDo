@@ -1,7 +1,7 @@
 'use client';
 
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 import React, { useState } from 'react';

@@ -1,6 +1,21 @@
+'use client';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
+
 import Image from "next/image";
 
 export default function Home() {
+
+  const [user] = useAuthState(auth);
+  if (user) {
+    window.location.href = '/dashboard';
+    return null; // Prevent rendering while redirecting
+  }else {
+    window.location.href = '/login';
+    return null; // Prevent rendering while redirecting
+  }
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
