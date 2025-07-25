@@ -1,46 +1,39 @@
 'use client';
 
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { signInWithPopup } from 'firebase/auth';
-import { auth, provider } from '@/lib/firebase';
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const [error, setError] = useState('');
+  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
-  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      setError(errorData.message || 'Login failed');
-      return;
+  const handleLogin = async () => {
+    try {
+      const result = await signInWithEmailAndPassword(email, password);
+      console.log(result);
+      setEmail('');
+      setPassword('');
+      window.location.href = '/dashboard';
+    } catch (error) {
+      console.error('Login failed:', error);
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, new GoogleAuthProvider());
       const user = result.user;
 
       console.log('Logged in user:', user);
-      // You can store user info, send to backend, etc.
-
-      window.location.href = '/dashboard'; // or wherever
+      window.location.href = '/dashboard';
     } catch (err: any) {
-      setError(err.message);
+      console.error('Google login failed:', err);
     }
   };
 
@@ -79,22 +72,31 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
+        <div className="flex items-center w-full max-w-sm gap-4">
+          <div className="h-px flex-1 bg-black/20 dark:bg-white/20" />
+          <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">or</span>
+          <div className="h-px flex-1 bg-black/20 dark:bg-white/20" />
+        </div>
 
-        <button
-          onClick={handleGoogleLogin}
-          className="bg-white text-black border border-black px-4 py-2 rounded shadow flex gap-2 items-center hover:bg-gray-100 transition"
-        >
-          <Image src="/google.svg" alt="Google logo" width={20} height={20} />
-          Continue with Google
-        </button>
+        <div className="w-full max-w-sm">
+          <button
+            onClick={handleGoogleLogin}
+            className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium h-10 sm:h-12 px-4 sm:px-6 w-full gap-5"
+          >
+            <Image src="/google.svg" alt="Google logo" width={20} height={20} />
+            Continue with Google
+          </button>
+
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center pt-6">
+            No account?{' '}
+            <a
+              href="/register"
+              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+            >
+              Go to Sign Up
+            </a>
+          </p>
+        </div>
       </main>
     </div>
   );
