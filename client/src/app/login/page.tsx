@@ -40,6 +40,7 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, new GoogleAuthProvider());
       const user = result.user;
 
+
       console.log("Logged in user:", user);
       window.location.href = "/dashboard";
     } catch (err: any) {
