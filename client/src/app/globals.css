@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+button,
+[role="button"],
+a {
+  cursor: pointer;
+}
+
