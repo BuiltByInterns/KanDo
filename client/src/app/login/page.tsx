@@ -13,8 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const isValidEmail = (email: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const { isValidEmail } = require("@/lib/_helper");
 
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
@@ -54,11 +53,11 @@ export default function LoginPage() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <h1 className="text-2xl font-bold">Log In</h1>
         {error && (
-          <div className="w-full max-w-sm flex items-center justify-between gap-3 bg-red-100 text-red-800 border border-red-300 rounded-md px-4 py-3 text-sm shadow-sm">
-            <span>{error}</span>
+          <div className="absolute top-0 left-0 right-0 flex items-center gap-3 bg-red-100 text-red-800 border border-red-300 rounded-md px-4 py-3 text-sm shadow-sm">
+            <span className="flex-1 break-words">{error}</span>
             <button
               onClick={() => setError("")}
-              className="text-red-800 hover:text-red-500 transition-colors"
+              className="text-red-800 hover:text-red-500 transition-colors flex-shrink-0"
               aria-label="Close error message"
             >
               <svg
@@ -156,12 +155,20 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+            <div className="flex justify-end mt-1">
+              <a
+                href="/forgot-password"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              >
+                Forgot your password?
+              </a>
+            </div>
           </div>
           <button
             type="submit"
             className={`rounded-full border border-transparent transition-colors flex items-center justify-center font-medium h-10 sm:h-12 px-4 sm:px-5
     ${
-      isValidEmail(email)
+      isValidEmail(email) && email && password
         ? "bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc]"
         : "bg-gray-400 text-white cursor-not-allowed"
     }`}

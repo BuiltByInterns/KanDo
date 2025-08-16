@@ -1,19 +1,18 @@
-'use client';
+"use client";
 
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
 
 import Image from "next/image";
 
 export default function Home() {
-
   const [user] = useAuthState(auth);
   if (user) {
-    window.location.href = '/dashboard';
-    return null; // Prevent rendering while redirecting
-  }else {
-    window.location.href = '/login';
-    return null; // Prevent rendering while redirecting
+    window.location.href = "/dashboard";
+    return null;
+  } else {
+    window.location.href = "/login";
+    return null;
   }
 
   return (

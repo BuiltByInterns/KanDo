@@ -1,4 +1,5 @@
-# Kanban Board
+<h1 align="center">KanDo Kanban Board</h1>
+
 An open source, self-hosted management tool that can serve as an alternative to services such as Trello and Notion
 
 # Dependencies
@@ -15,7 +16,7 @@ cd client
 npm install 
 ```
 
-This will install all dependencies as defined in the `client/package,json` file.
+This will install all dependencies as defined in the `client/package.json` file.
 
 ### Frontend Dependencies Breakdown
 
@@ -45,7 +46,7 @@ cd server
 npm install 
 ```
 
-This will install all dependencies as defined in the `client/package,json` file.
+This will install all dependencies as defined in the `client/package.json` file.
 
 ### Backend Dependencies Breakdown
 
