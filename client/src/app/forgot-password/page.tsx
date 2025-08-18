@@ -9,7 +9,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { isValidEmail } = require("@/lib/_helper");
+  const { isValidEmail } = require("@/lib/helper");
 
   const handleForgotPassword = async () => {
     await sendPasswordResetEmail(auth, email);
