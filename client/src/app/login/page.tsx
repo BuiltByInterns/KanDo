@@ -3,6 +3,7 @@
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 import React, { useState } from "react";
 import Image from "next/image";
@@ -17,6 +18,13 @@ export default function LoginPage() {
 
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
+  const router = useRouter();
+
+  const routeToDashboard = (userName: string) => {
+    const encodedUserName = encodeURIComponent(userName);
+    router.push(`/u/${encodedUserName}/boards`);
+  };
+
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
@@ -25,8 +33,12 @@ export default function LoginPage() {
         setEmail("");
         setPassword("");
         setError("");
-        window.location.href = "/dashboard";
-        console.log("Logged in user:", result.user);
+
+        const userId = result.user.uid;
+        const userName =
+          result.user.displayName?.replace(/\s+/g, "") || "unknown";
+
+        routeToDashboard(userName);
       } else {
         setError("Invalid email or password");
       }
@@ -42,7 +54,11 @@ export default function LoginPage() {
 
 
       console.log("Logged in user:", user);
-      window.location.href = "/dashboard";
+      const userId = result.user.uid;
+      const userName =
+        result.user.displayName?.replace(/\s+/g, "") || "unknown";
+
+      routeToDashboard(userName);
     } catch (err: any) {
       console.error("Google login failed:", err);
     }
