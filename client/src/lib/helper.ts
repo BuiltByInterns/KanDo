@@ -81,9 +81,12 @@ export async function createNewBoard(
       name: boardName,
       createdAt: new Date(),
       ownerId: userId,
+<<<<<<< HEAD
       privacy: "private",
       members: [userId],
       pinned: false,
+=======
+>>>>>>> origin/main
     };
 
     const newBoard = await addDoc(boardRef, newBoardData);
@@ -99,6 +102,7 @@ export async function createNewBoard(
     return null;
   }
 }
+<<<<<<< HEAD
 
 /** A helper function that pins a board for a user.
  * It updates the board document in the "Boards" collection to set the pinned state to true.
@@ -116,3 +120,5 @@ export async function pinBoard(
     pinned: pinStatus,
   });
 }
+=======
+>>>>>>> origin/main

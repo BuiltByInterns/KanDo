@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { isValidEmail } = require("@/lib/_helper");
+  const { isValidEmail } = require("@/lib/helper");
 
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
@@ -51,7 +51,6 @@ export default function LoginPage() {
     try {
       const result = await signInWithPopup(auth, new GoogleAuthProvider());
       const user = result.user;
-
 
       console.log("Logged in user:", user);
       const userId = result.user.uid;
