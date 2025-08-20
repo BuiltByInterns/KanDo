@@ -1,84 +1,83 @@
 <h1 align="center">KanDo Kanban Board</h1>
 
-An open source, self-hosted management tool that can serve as an alternative to services such as Trello and Notion
+<p align="center">
+  An open-source, self-hosted kanban management tool — a lightweight alternative to Trello and Notion.
+</p>
 
-# Dependencies
+---
 
-Here are all the dependencies used in the platform along with installation commands.
+## 🚀 Features
+- Self-hosted and open-source
+- Built with **Next.js**, **Firebase**, and **TailwindCSS**
+- Real-time updates with Firebase
+- Simple and customizable UI
 
-## Frontend Dependencies
+---
 
+
+## 📦 Tech Stack
+
+### Frontend
+- **Core:** Next.js (15.4.1), React (19.1.0), React DOM (19.1.0)
+- **Types:** @types/node (^20), @types/react (^19), @types/react-dom (^19)
+- **Firebase Integration:** firebase (^12.0.0), react-firebase-hooks (^5.1.1)
+- **Styling:** tailwindcss (^4), @tailwindcss/postcss (^4)
+
+### Backend
+- **Core:** Node.js
+- **Environment Management:** dotenv (^17.2.0)
+- **Firebase:** firebase (^12.0.0)
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
 ```bash
-# Navigate to the frontend directory
-cd client
-
-# Install all frontend dependencies
-npm install 
+git clone https://github.com/your-username/kando.git
+cd kando
 ```
 
-This will install all dependencies as defined in the `client/package.json` file.
-
-### Frontend Dependencies Breakdown
-
-- **Core Nextjs:**
-    - next: 15.4.1
-    - react: 19.1.0
-    - react-dom: 19.1.0
-    - @types/node: ^20
-    - @types/react: ^19
-    - @types/react-dom: ^19
-    
-- **Firebase:**
-    - firebase: ^12.0.0
-    - react-firebase-hooks: ^5.1.1
-
-- **UI Components:**
-    - tailwindcss: ^4
-    - @tailwindcss/postcss: ^4
-
-## Backend Dependencies
-
-```bash
-# Navigate to the backend directory
-cd server
-
-# Install all backend dependencies
-npm install 
-```
-
-This will install all dependencies as defined in the `client/package.json` file.
-
-### Backend Dependencies Breakdown
-
-- dotenv: ^17.2.0
-- firebase: ^12.0.0
-
-# Installation
-
-## Frontend Setup
-
-1. Navigate to the client directory:
+### 2. Frontend Setup
 ```bash
 cd client
-```
-
-1. Install dependencies
-```bash
 npm install
-```
-
-3. Create a `.env.local` file:
-```bash
 cp .env.example .env.local
 ```
-
-4. Set environment variables from firebase project
-
-5. Run the front end in development mode:
+- Update .env.local with your Firebase project credentials.
+- Start the development server:
 ```bash
 npm run dev
 ```
 
-## License
+### 3. Backend Setup
+```bash
+cd ../server
+npm install
+cp .env.example .env
+```
+- Update .env with required environment variables.
+- Start the backend:
+```bash
+npm start
+```
 
-[MIT](https://choosealicense.com/licenses/mit/)
+--- 
+
+## 📚 Project Structure
+```bash
+kando/
+├── client/     # Frontend (Next.js + TailwindCSS + Firebase)
+├── server/     # Backend (Node.js + Firebase + dotenv)
+└── README.md   # Project documentation
+```
+
+## 🤝 Contributing
+Contributions are welcome!
+- Fork the repo
+- Create a feature branch (`git checkout -b feature/new-feature`)
+- Commit your changes (`git commit -m "Add new feature"`)
+- Push to your branch and open a PR
+
+## 📄 License
+This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/).
