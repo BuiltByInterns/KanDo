@@ -3,20 +3,28 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import Image from "next/image";
 
 export default function Home() {
   const router = useRouter();
-  const [user] = useAuthState(auth);
-  if (user) {
-    window.location.href = "/dashboard";
-    router.replace("/dashboard");
-    return null;
-  } else {
-    window.location.href = "/login";
-    router.replace("/login");
-    return null;
+  const [user, loading] = useAuthState(auth);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    } else if (user) {
+      router.replace("/u/" + user.displayName + "/boards");
+    }
+  }, [loading, user, router]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return null; // we’ll redirect anyway
   }
 
   return (

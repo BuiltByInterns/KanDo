@@ -90,10 +90,13 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
   }) => (
     <div
       key={board.id}
-      className="relative min-w-[200px] h-32 p-4 rounded-xl shadow-md bg-gray-100 dark:bg-gray-800 
-        hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer flex flex-col justify-between group"
       onClick={() => openBoard(board.id)}
+      className="relative min-w-[200px] h-32 p-4 rounded-xl shadow-md 
+        bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700
+        hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer 
+        flex flex-col justify-between group"
     >
+      {/* Pin button */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -128,7 +131,7 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
         </svg>
       </button>
 
-      <p className="font-semibold text-lg text-foreground truncate">
+      <p className="font-semibold text-lg text-gray-900 dark:text-white truncate">
         {board.name || "Untitled Board"}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">ID: {board.id}</p>
@@ -136,28 +139,37 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
   );
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-10 row-start-2 w-full max-w-6xl">
+    <div
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br 
+      from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-6 py-10"
+    >
+      <main className="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 space-y-10">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-foreground">Your Workspace</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Your Workspace
+          </h1>
           <div className="flex gap-3">
             <button
               onClick={() => router.push(`/u/${userName}/account`)}
-              className="rounded-lg border border-transparent transition-colors flex items-center justify-center 
-        bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium h-10 px-4"
+              className="rounded-full bg-black text-white hover:bg-gray-800 
+                dark:bg-white dark:text-black dark:hover:bg-gray-200 
+                font-medium h-10 px-5 transition-colors"
             >
               Account Settings
             </button>
             <button
               onClick={handleSignOut}
-              className="rounded-lg border border-transparent transition-colors flex items-center justify-center 
-        bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium h-10 px-4"
+              className="rounded-full bg-black text-white hover:bg-gray-800 
+                dark:bg-white dark:text-black dark:hover:bg-gray-200 
+                font-medium h-10 px-5 transition-colors"
             >
               Sign Out
             </button>
           </div>
         </div>
 
+        {/* User Info */}
         {user && (
           <div className="flex items-center gap-4">
             <img
@@ -166,7 +178,7 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <p className="font-semibold text-lg">
+              <p className="font-semibold text-lg text-gray-900 dark:text-white">
                 {user.displayName || "Unnamed"}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -176,8 +188,11 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
           </div>
         )}
 
+        {/* Pinned Boards */}
         <section>
-          <h2 className="text-xl font-semibold mb-3">Pinned Boards</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+            Pinned Boards
+          </h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {boardList.filter((b) => b.pinned).length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400">
@@ -189,13 +204,17 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
           </div>
         </section>
 
+        {/* All Boards */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-semibold">All Boards</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              All Boards
+            </h2>
             <button
               onClick={() => setAddingBoard(true)}
-              className="rounded-lg border border-transparent transition-colors flex items-center justify-center 
-              bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium h-9 px-3"
+              className="rounded-full bg-black text-white hover:bg-gray-800 
+                dark:bg-white dark:text-black dark:hover:bg-gray-200 
+                font-medium h-9 px-5 transition-colors"
             >
               + Create Board
             </button>
@@ -210,8 +229,9 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
 
             {addingBoard && (
               <div
-                className="min-w-[200px] h-32 p-4 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 
-                  bg-white dark:bg-gray-900 flex flex-col justify-center"
+                className="min-w-[200px] h-32 p-4 rounded-xl shadow-md border 
+                  border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 
+                  flex flex-col justify-center"
               >
                 <input
                   type="text"
@@ -227,8 +247,8 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
                   autoFocus
                   placeholder="Board name..."
                   className="p-2 rounded-md border border-gray-300 dark:border-gray-600 
-                    bg-gray-50 dark:bg-gray-800 text-foreground text-sm focus:ring-2 
-                    focus:ring-blue-500 focus:outline-none"
+                    bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm 
+                    focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
                 />
               </div>
             )}
