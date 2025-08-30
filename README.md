@@ -28,6 +28,11 @@
 - **Environment Management:** dotenv (^17.2.0)
 - **Firebase:** firebase (^12.0.0)
 
+## Testing
+- **Jest:** jest (^30.1.1), jest-environment-jsdom (^30.1.1)
+- **Babel:** @babel/preset-env (^7.28.3), @babel/preset-react (^7.27.1), @babel/preset-typescript (^7.27.1)
+- **Testing Library:** @testing-library/jest-dom (^6.8.0), @testing-library/react (^16.3.0), @testing-library/user-event (^14.6.1)
+
 ---
 
 ## ⚙️ Installation & Setup
