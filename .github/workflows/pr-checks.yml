@@ -17,7 +17,7 @@ jobs:
       - name: Install nodemon
         run: npm install -g nodemon
       - name: Run server tests
-        run: nodemon . # Change to 'nodemon .' if you do not have tests, but tests are highly recommended
+        run: npm test # Change to 'nodemon .' if you do not have tests, but tests are highly recommended
 
   client-test:
     runs-on: ubuntu-latest
