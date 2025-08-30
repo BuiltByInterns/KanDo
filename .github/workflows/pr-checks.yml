@@ -14,10 +14,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install dependencies
         run: npm install
-      - name: Install nodemon
-        run: npm install -g nodemon
+      # Removed global nodemon installation
+      
       - name: Run server tests
-        run: nodemon . # Change to 'nodemon .' if you do not have tests, but tests are highly recommended
+        run: npx nodemon . # Change to 'npx nodemon .' if you do not have tests, but tests are highly recommended
 
   client-test:
     runs-on: ubuntu-latest
