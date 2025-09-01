@@ -21,7 +21,7 @@
 - **Core:** Next.js (15.4.1), React (19.1.0), React DOM (19.1.0)
 - **Types:** @types/node (^20), @types/react (^19), @types/react-dom (^19)
 - **Firebase Integration:** firebase (^12.0.0), react-firebase-hooks (^5.1.1)
-- **Styling:** tailwindcss (^4), @tailwindcss/postcss (^4)
+- **Styling:** tailwindcss (^4), @tailwindcss/postcss (^4), lucide-react (^0.542.0)
 
 ### Backend
 - **Core:** Node.js
