@@ -11,7 +11,7 @@
 
   --accent: #000000;
   --accent-contrast: #ffffff;
-  --accent-hover: #1f2937;
+  --accent-hover: #2f3032;
 
   --success: #22c55e;
   --danger: #ef4444;
@@ -25,6 +25,7 @@
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
   --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
 
   --color-accent: var(--accent);
   --color-accent-contrast: var(--accent-contrast);
@@ -41,17 +42,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --background-alt: #111111;
+    --background: #201E25;
+    --background-alt: #2F2D34;
 
     --foreground: #f3f4f6;
     --foreground-muted: #9ca3af;
 
-    --border: #1f2937;
+    --border: #39383E;
+    --border-hover: #4B494F;
 
-    --accent: #ffffff;
-    --accent-contrast: #000000;
-    --accent-hover: #d1d5db;
+    --accent: #2F2F31;
+    --accent-contrast: #373739;
+    --accent-hover: #323232;
   }
 }
 

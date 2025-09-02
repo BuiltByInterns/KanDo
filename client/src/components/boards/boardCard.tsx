@@ -21,10 +21,9 @@ export default function BoardCard({
     <div
       onClick={() => openBoard(board.id)}
       className="relative min-w-[220px] h-36 p-4 rounded-xl shadow-md 
-        bg-[#2B2B40] hover:bg-[#35354a] transition cursor-pointer 
+        bg-background-alt hover:bg-border-hover transition cursor-pointer 
         flex flex-col justify-between group"
     >
-      {/* Pin Button */}
       <button
         onClick={(e) => {
           e.stopPropagation();

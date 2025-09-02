@@ -13,7 +13,6 @@ import {
 import { LayoutDashboard, LogOut, User, Pin, PinOff, Plus } from "lucide-react";
 import Sidebar from "@/components/navigation/sidebar";
 import BoardCard from "@/components/boards/boardCard";
-import UserProfile from "@/components/user/userProfile";
 
 interface DashboardPageProps {
   userName: string;
@@ -81,33 +80,65 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-background-alt text-gray-100">
+    <div className="flex min-h-screen bg-background text-gray-100">
       <Sidebar onSignOut={handleSignOut} userName={userName} user={user} />
 
-      <main className="flex-1 p-8 overflow-y-auto space-y-10">
-        <header className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Your Workspace</h1>
+      <main className="flex-1 overflow-y-auto space-y-10">
+        <header className="flex items-center justify-between px-8 py-4 border-b border-border w-full">
+          <h1 className="flex items-center text-2xl font-semibold">
+            <LayoutDashboard className="inline-block w-6 h-6 mr-4" />
+            My Boards
+          </h1>
           <button
             onClick={() => setAddingBoard(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white"
+            className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-medium transition-all duration-300 ease-out group"
           >
-            <Plus className="w-5 h-5" />
-            New Board
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-xl p-[1px] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+               bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute inset-[1px] rounded-lg bg-background-alt pointer-events-none z-10"
+            />
+            <span className="relative z-20 flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Create Board
+            </span>
           </button>
         </header>
 
-        {user && <UserProfile user={user} />}
+        <div className="px-8 space-y-15">
+          {/* Pinned Boards */}
+          <section>
+            <h2 className="text-xl font-semibold mb-3">Pinned Boards</h2>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {boardList.filter((b) => b.pinned).length === 0 ? (
+                <p className="text-gray-400">No pinned boards.</p>
+              ) : (
+                boardList
+                  .filter((b) => b.pinned)
+                  .map((board) => (
+                    <BoardCard
+                      key={board.id}
+                      board={board}
+                      togglePin={togglePinBoard}
+                      openBoard={openBoard}
+                    />
+                  ))
+              )}
+            </div>
+          </section>
 
-        {/* Pinned Boards */}
-        <section>
-          <h2 className="text-xl font-semibold mb-3">Pinned Boards</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {boardList.filter((b) => b.pinned).length === 0 ? (
-              <p className="text-gray-400">No pinned boards.</p>
-            ) : (
-              boardList
-                .filter((b) => b.pinned)
-                .map((board) => (
+          {/* All Boards */}
+          <section>
+            <h2 className="text-xl font-semibold mb-3">My Boards</h2>
+            <div className="flex gap-4 flex-wrap">
+              {boardList.length === 0 ? (
+                <p className="text-gray-400">No boards yet.</p>
+              ) : (
+                boardList.map((board) => (
                   <BoardCard
                     key={board.id}
                     board={board}
@@ -115,59 +146,62 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
                     openBoard={openBoard}
                   />
                 ))
-            )}
-          </div>
-        </section>
+              )}
 
-        {/* All Boards */}
-        <section>
-          <h2 className="text-xl font-semibold mb-3">All Boards</h2>
-          <div className="flex gap-4 flex-wrap">
-            {boardList.length === 0 ? (
-              <p className="text-gray-400">No boards yet.</p>
-            ) : (
-              boardList.map((board) => (
-                <BoardCard
-                  key={board.id}
-                  board={board}
-                  togglePin={togglePinBoard}
-                  openBoard={openBoard}
-                />
-              ))
-            )}
-
-            {addingBoard && (
-              <div className="min-w-[220px] h-36 p-4 rounded-xl shadow-md border border-gray-700 bg-[#2B2B40] flex flex-col justify-center">
-                <input
-                  type="text"
-                  value={newBoardName}
-                  onChange={(e) => setNewBoardName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreateBoard()}
-                  autoFocus
-                  placeholder="Board name..."
-                  className="p-2 rounded-md border border-gray-600 bg-[#1E1E2F] text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-                <div className="flex gap-3 mt-3">
-                  <button
-                    onClick={handleCreateBoard}
-                    className="flex-1 px-3 py-1 rounded-lg bg-green-600 hover:bg-green-700 transition text-white"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAddingBoard(false);
-                      setNewBoardName("");
-                    }}
-                    className="flex-1 px-3 py-1 rounded-lg bg-gray-600 hover:bg-gray-700 transition text-white"
-                  >
-                    Cancel
-                  </button>
+              {addingBoard && (
+                <div className="min-w-[220px] h-36 p-4 rounded-xl shadow-md border border-gray-700 bg-[#2B2B40] flex flex-col justify-center">
+                  <input
+                    type="text"
+                    value={newBoardName}
+                    onChange={(e) => setNewBoardName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleCreateBoard()}
+                    autoFocus
+                    placeholder="Board name..."
+                    className="p-2 rounded-md border border-gray-600 bg-[#1E1E2F] text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  <div className="flex gap-3 mt-3">
+                    <button
+                      onClick={handleCreateBoard}
+                      className="flex-1 px-3 py-1 rounded-lg bg-green-600 hover:bg-green-700 transition text-white"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setAddingBoard(false);
+                        setNewBoardName("");
+                      }}
+                      className="flex-1 px-3 py-1 rounded-lg bg-gray-600 hover:bg-gray-700 transition text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </section>
+              )}
+            </div>
+          </section>
+
+          {/* Shared with You Boards */}
+          <section>
+            <h2 className="text-xl font-semibold mb-3">Shared with You</h2>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {boardList.filter((b) => b.pinned).length === 0 ? (
+                <p className="text-gray-400">No pinned boards.</p>
+              ) : (
+                boardList
+                  .filter((b) => b.pinned)
+                  .map((board) => (
+                    <BoardCard
+                      key={board.id}
+                      board={board}
+                      togglePin={togglePinBoard}
+                      openBoard={openBoard}
+                    />
+                  ))
+              )}
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );
