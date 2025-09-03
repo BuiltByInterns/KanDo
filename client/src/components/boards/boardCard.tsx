@@ -1,6 +1,6 @@
 "use client";
 
-import { Pin, PinOff } from "lucide-react";
+import { Pin, PinOff, Star } from "lucide-react";
 
 interface BoardCardProps {
   board: {
@@ -18,30 +18,72 @@ export default function BoardCard({
   openBoard,
 }: BoardCardProps) {
   return (
+    // <div
+    //   onClick={() => openBoard(board.id)}
+    //   className="relative min-w-[250px] h-36 p-4 rounded-xl shadow-md
+    //     bg-background-alt hover:bg-border-hover transition cursor-pointer
+    //     flex flex-col justify-between group"
+    // >
+    //   <button
+    //     onClick={(e) => {
+    //       e.stopPropagation();
+    //       togglePin(board.id);
+    //     }}
+    //     className="absolute top-2 right-2 p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+    //   >
+    //     {board.pinned ? (
+    //       <Pin className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+    //     ) : (
+    //       <PinOff className="w-5 h-5 text-gray-400" />
+    //     )}
+    //   </button>
+
+    //   <p className="font-semibold text-lg text-white truncate">
+    //     {board.name || "Untitled Board"}
+    //   </p>
+    //   <p className="text-xs text-gray-400">ID: {board.id}</p>
+    // </div>
     <div
       onClick={() => openBoard(board.id)}
-      className="relative min-w-[220px] h-36 p-4 rounded-xl shadow-md 
-        bg-background-alt hover:bg-border-hover transition cursor-pointer 
-        flex flex-col justify-between group"
+      className="relative min-w-[250px] h-36 rounded-xl shadow-md 
+    bg-background-alt hover:bg-border-hover transition cursor-pointer 
+    flex flex-col group overflow-hidden"
     >
       <button
         onClick={(e) => {
           e.stopPropagation();
           togglePin(board.id);
         }}
-        className="absolute top-2 right-2 p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+        className="absolute top-2 right-2 p-1 rounded-md 
+    bg-black/40 backdrop-blur-sm 
+    opacity-0 group-hover:opacity-100 transition z-10"
       >
         {board.pinned ? (
-          <Pin className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+          <Star
+            className="w-5 h-5 text-yellow-400 fill-yellow-400 transition-transform duration-200 ease-out 
+        hover:scale-120"
+          />
         ) : (
-          <PinOff className="w-5 h-5 text-gray-400" />
+          <Star
+            className="w-5 h-5 text-gray-400 transition-transform duration-200 ease-out 
+        hover:scale-120 hover:text-yellow-400"
+          />
         )}
       </button>
 
-      <p className="font-semibold text-lg text-white truncate">
-        {board.name || "Untitled Board"}
-      </p>
-      <p className="text-xs text-gray-400">ID: {board.id}</p>
+      <div className="h-2/3 relative w-full">
+        <img
+          src={board.backgroundId || "/default-board.jpg"}
+          alt={board.name || "Board preview"}
+          className="absolute inset-0 w-full h-full object-cover rounded-t-xl"
+        />
+      </div>
+
+      <div className="h-1/3 flex px-3 pb-3 items-end">
+        <p className="font-semibold text-lg text-white truncate">
+          {board.name || "Untitled Board"}
+        </p>
+      </div>
     </div>
   );
 }

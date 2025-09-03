@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+import { User } from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -6,7 +7,9 @@ import {
   collection,
   updateDoc,
   arrayUnion,
+  setDoc,
 } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 /**
  * A helper function that checks the validity of an email address.
@@ -115,4 +118,81 @@ export async function pinBoard(
   await updateDoc(boardRef, {
     pinned: pinStatus,
   });
+}
+
+/**
+ * Helper functions that keeps track of the user's 3 most recent boards.
+ */
+
+const LOCAL_STORAGE_KEY = "recentBoards";
+
+export async function getRecentBoards(userId: string): Promise<string[]> {
+  const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (localData) {
+    try {
+      return JSON.parse(localData);
+    } catch {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+  }
+
+  try {
+    const docRef = doc(db, "Users", userId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) return [];
+
+    const boards = docSnap.data().RecentBoards;
+    if (!boards || !Array.isArray(boards) || boards.length === 0) {
+      return [];
+    }
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(boards));
+    return boards;
+  } catch (error) {
+    console.error("Error fetching recent boards from Firestore:", error);
+    return [];
+  }
+}
+
+export async function addRecentBoard(
+  userID: string,
+  boardID: string
+): Promise<void> {
+  let boards: string[] = [];
+
+  const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (localData) {
+    try {
+      boards = JSON.parse(localData);
+    } catch {
+      boards = [];
+    }
+  }
+
+  boards = boards.filter((id) => id !== boardID);
+  boards.unshift(boardID);
+  if (boards.length > 3) boards = boards.slice(0, 3);
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(boards));
+
+  try {
+    const docRef = doc(db, "Users", userID);
+    await setDoc(docRef, { RecentBoards: boards }, { merge: true });
+  } catch (error) {
+    console.error("Error updating recent boards in Firestore:", error);
+  }
+}
+
+export async function openBoard(
+  id: string,
+  user: User,
+  router: ReturnType<typeof useRouter>
+): Promise<void> {
+  const board = await getBoardInfo(id);
+  if (!board) return;
+
+  await addRecentBoard(user.uid, id);
+
+  const boardName = encodeURIComponent(board.name || "Untitled");
+  router.push(`/b/${id}/${boardName}`);
 }

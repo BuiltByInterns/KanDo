@@ -7,17 +7,18 @@ interface NavItemProps {
   label: string;
   href: string;
   icon: ReactNode;
+  onClick?: () => void;
 }
 
-export default function NavItem({ label, href, icon }: NavItemProps) {
+export default function NavItem({ label, href, icon, onClick }: NavItemProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isActive = pathname === href; // exact match (or use startsWith for sections)
+  const isActive = href ? pathname.startsWith(href) : false;
 
   return (
     <button
-      onClick={() => router.push(href)}
+      onClick={onClick ?? (() => router.push(href))}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition
         ${
           isActive

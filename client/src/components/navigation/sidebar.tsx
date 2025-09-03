@@ -1,5 +1,6 @@
 "use client";
 
+import { getRecentBoards, getBoardInfo, openBoard } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -14,7 +15,7 @@ import {
   Folder,
   Home,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Key } from "react";
 import Image from "next/image";
 import NavItem from "./navItemProp";
 import SearchModal from "../search/searchModal";
@@ -27,6 +28,7 @@ interface SidebarProps {
         photoURL?: string | null;
         displayName?: string | null;
         email?: string | null;
+        uid: string;
       }
     | null
     | undefined;
@@ -34,6 +36,13 @@ interface SidebarProps {
 
 export default function Sidebar({ onSignOut, userName, user }: SidebarProps) {
   const router = useRouter();
+  const [recentBoards, setRecentBoards] = useState<
+    {
+      id: Key | null | undefined;
+      label: string;
+      href: string;
+    }[]
+  >([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -61,24 +70,6 @@ export default function Sidebar({ onSignOut, userName, user }: SidebarProps) {
     },
   ];
 
-  const tempNavItems = [
-    {
-      label: "Board2",
-      href: `/templates`,
-      icon: <Folder className="w-5 h-5" />,
-    },
-    {
-      label: "Board1",
-      href: `/templates`,
-      icon: <Folder className="w-5 h-5" />,
-    },
-    {
-      label: "Board3",
-      href: `/templates`,
-      icon: <Folder className="w-5 h-5" />,
-    },
-  ];
-
   const bottomNavItems = [
     {
       label: "Feedback",
@@ -96,6 +87,36 @@ export default function Sidebar({ onSignOut, userName, user }: SidebarProps) {
       icon: <HelpCircleIcon className="w-5 h-5" />,
     },
   ];
+
+  useEffect(() => {
+    async function fetchRecents() {
+      if (!user || !user.uid) return;
+
+      const boardIds = await getRecentBoards(user.uid);
+      const boardsData = await Promise.all(
+        boardIds.map(async (id) => {
+          const info = await getBoardInfo(id);
+          return info
+            ? {
+                id,
+                label: info.name || "Untitled",
+                href: `/b/${id}/${info.name || ""}`,
+              }
+            : null;
+        })
+      );
+
+      setRecentBoards(
+        boardsData.filter(Boolean) as {
+          id: string;
+          label: string;
+          href: string;
+        }[]
+      );
+    }
+
+    fetchRecents();
+  }, [user]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -190,10 +211,20 @@ export default function Sidebar({ onSignOut, userName, user }: SidebarProps) {
           <div className="border-t border-border w-[90%]" />
         </div>
 
-        <p>Recent:</p>
-        {tempNavItems.map((item) => (
-          <NavItem key={item.label} {...item} />
-        ))}
+        <p className="text-gray-400 font-semibold mb-1">Recent:</p>
+        {recentBoards.length === 0 ? (
+          <p className="text-gray-500 text-sm">No recent boards.</p>
+        ) : (
+          recentBoards.map((item) => (
+            <NavItem
+              key={item.id}
+              label={item.label}
+              href={item.href}
+              icon={<Folder className="w-5 h-5" />}
+              onClick={() => openBoard(item.id, user, router)}
+            />
+          ))
+        )}
       </nav>
 
       <div className="border-t border-border p-4">

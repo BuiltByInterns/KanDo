@@ -3,6 +3,7 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { navigate } from "@/lib/navigation";
 import { useEffect } from "react";
 
 import Image from "next/image";
@@ -15,7 +16,9 @@ export default function Home() {
     if (!loading && !user) {
       router.replace("/login");
     } else if (user) {
-      router.replace("/u/" + user.displayName + "/boards");
+      if (user.displayName && user.displayName.trim() !== "") {
+        router.replace(`/u/${encodeURIComponent(user.displayName)}/boards`);
+      }
     }
   }, [loading, user, router]);
 
@@ -24,7 +27,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return null; // we’ll redirect anyway
+    return null;
   }
 
   return (

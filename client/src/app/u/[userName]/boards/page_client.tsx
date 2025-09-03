@@ -1,16 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { navigate } from "@/lib/navigation";
 import { auth } from "@/lib/firebase";
 import { useEffect, useState } from "react";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import {
   getUserBoards,
   getBoardInfo,
   createNewBoard,
   pinBoard,
+  openBoard,
 } from "@/lib/helper";
-import { LayoutDashboard, LogOut, User, Pin, PinOff, Plus } from "lucide-react";
+import {
+  LayoutDashboard,
+  Plus,
+  Star,
+  Component,
+  Waypoints,
+} from "lucide-react";
 import Sidebar from "@/components/navigation/sidebar";
 import BoardCard from "@/components/boards/boardCard";
 
@@ -20,13 +28,47 @@ interface DashboardPageProps {
 
 export default function DashboardPage({ userName }: DashboardPageProps) {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [boardList, setBoardList] = useState<
     { id: string; name?: string; pinned?: boolean }[]
   >([]);
   const [addingBoard, setAddingBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
 
+  function redirectToUserBoards(
+    user: User,
+    router: ReturnType<typeof useRouter>
+  ) {
+    const name = user.displayName?.trim();
+    if (name) router.replace(`/u/${name}/boards`);
+  }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        router.replace("/login");
+        return;
+      }
+
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    const name = user?.displayName?.trim();
+    if (name) {
+      if (user) redirectToUserBoards(user, router);
+    }
+  }, [user, router]);
+
+  /* Listen for Firebase auth state changes
+   * - If user is not logged in, redirect to login page
+   * - If user is logged in, store user in state
+   * - If user has a display name, redirect to their boards page
+   * - Cleans up the listener on component unmount
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) {
@@ -34,6 +76,9 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
         return;
       }
       setUser(currentUser);
+      if (currentUser.displayName && currentUser.displayName.trim() !== "") {
+        router.replace(`/u/${currentUser.displayName}/boards`);
+      }
     });
     return () => unsubscribe();
   }, [router]);
@@ -74,11 +119,6 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
     pinBoard(id, !boardList.find((b) => b.id === id)?.pinned);
   };
 
-  const openBoard = (id: string) => {
-    const name: string | undefined = boardList.find((b) => b.id === id)?.name;
-    router.push(`/b/${id}/${name}`);
-  };
-
   return (
     <div className="flex min-h-screen bg-background text-gray-100">
       <Sidebar onSignOut={handleSignOut} userName={userName} user={user} />
@@ -110,12 +150,14 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
         </header>
 
         <div className="px-8 space-y-15">
-          {/* Pinned Boards */}
           <section>
-            <h2 className="text-xl font-semibold mb-3">Pinned Boards</h2>
+            <h2 className="flex text-xl items-center font-semibold mb-3">
+              <Star className="inline-block w-5 h-5 mr-3" />
+              Starred Boards
+            </h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
               {boardList.filter((b) => b.pinned).length === 0 ? (
-                <p className="text-gray-400">No pinned boards.</p>
+                <p className="text-gray-400">No starred boards.</p>
               ) : (
                 boardList
                   .filter((b) => b.pinned)
@@ -124,16 +166,20 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
                       key={board.id}
                       board={board}
                       togglePin={togglePinBoard}
-                      openBoard={openBoard}
+                      openBoard={() =>
+                        user && openBoard(board.id, user, router)
+                      }
                     />
                   ))
               )}
             </div>
           </section>
 
-          {/* All Boards */}
           <section>
-            <h2 className="text-xl font-semibold mb-3">My Boards</h2>
+            <h2 className="flex text-xl items-center font-semibold mb-3">
+              <Component className="inline-block w-5 h-5 mr-3" />
+              My Boards
+            </h2>
             <div className="flex gap-4 flex-wrap">
               {boardList.length === 0 ? (
                 <p className="text-gray-400">No boards yet.</p>
@@ -143,7 +189,7 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
                     key={board.id}
                     board={board}
                     togglePin={togglePinBoard}
-                    openBoard={openBoard}
+                    openBoard={() => user && openBoard(board.id, user, router)}
                   />
                 ))
               )}
@@ -181,9 +227,11 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
             </div>
           </section>
 
-          {/* Shared with You Boards */}
           <section>
-            <h2 className="text-xl font-semibold mb-3">Shared with You</h2>
+            <h2 className="flex text-xl items-center font-semibold mb-3">
+              <Waypoints className="inline-block w-5 h-5 mr-3" />
+              Shared with You
+            </h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
               {boardList.filter((b) => b.pinned).length === 0 ? (
                 <p className="text-gray-400">No pinned boards.</p>
@@ -195,7 +243,9 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
                       key={board.id}
                       board={board}
                       togglePin={togglePinBoard}
-                      openBoard={openBoard}
+                      openBoard={() =>
+                        user && openBoard(board.id, user, router)
+                      }
                     />
                   ))
               )}
