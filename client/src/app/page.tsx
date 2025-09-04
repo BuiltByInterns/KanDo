@@ -3,7 +3,6 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import { navigate } from "@/lib/navigation";
 import { useEffect } from "react";
 
 import Image from "next/image";

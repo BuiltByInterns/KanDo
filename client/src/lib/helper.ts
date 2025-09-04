@@ -172,7 +172,7 @@ export async function addRecentBoard(
 
   boards = boards.filter((id) => id !== boardID);
   boards.unshift(boardID);
-  if (boards.length > 3) boards = boards.slice(0, 3);
+  if (boards.length > 5) boards = boards.slice(0, 5);
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(boards));
 
   try {

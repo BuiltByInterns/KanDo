@@ -29,9 +29,9 @@ export default function BoardCard({
           e.stopPropagation();
           togglePin(board.id);
         }}
-        className="absolute top-2 right-2 p-1 rounded-md 
-    bg-black/40 backdrop-blur-sm 
-    opacity-0 group-hover:opacity-100 transition z-10"
+        className={`absolute top-2 right-2 p-1 rounded-md 
+    bg-black/40 backdrop-blur-sm transition z-10
+    ${board.pinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
       >
         {board.pinned ? (
           <Star

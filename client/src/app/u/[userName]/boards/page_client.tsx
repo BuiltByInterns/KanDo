@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { navigate } from "@/lib/navigation";
 import { auth } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import { signOut, onAuthStateChanged, User } from "firebase/auth";
@@ -124,7 +123,7 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
       <Sidebar onSignOut={handleSignOut} userName={userName} user={user} />
 
       <main className="flex-1 overflow-y-auto space-y-10">
-        <header className="flex items-center justify-between px-8 py-4 border-b border-border w-full">
+        <header className="flex max-h-16 items-center justify-between px-8 py-4 border-b border-border w-full">
           <h1 className="flex items-center text-2xl font-semibold">
             <LayoutDashboard className="inline-block w-6 h-6 mr-4" />
             My Boards
@@ -135,7 +134,7 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 rounded-xl p-[1px] pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+              className="absolute inset-0 rounded-xl inset-0 pointer-events-none z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
                bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
             />
             <span
