@@ -1,22 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #f9fafb;
+  --background-alt: #ffffff;
 
+  --foreground: #171717;
+  --foreground-muted: #6b7280;
+
+  --border: #e5e7eb;
+
+  --accent: #000000;
+  --accent-contrast: #ffffff;
+  --accent-hover: #2f3032;
+
+  --success: #22c55e;
+  --danger: #ef4444;
+
+  --radius: 0.75rem;
+}
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-hover: var(--accent-hover);
+
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --radius-lg: var(--radius);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #201E25;
+    --background-alt: #2F2D34;
+
+    --foreground: #f3f4f6;
+    --foreground-muted: #9ca3af;
+
+    --border: #39383E;
+    --border-hover: #4B494F;
+
+    --accent: #2F2F31;
+    --accent-contrast: #373739;
+    --accent-hover: #323232;
   }
 }
 
@@ -24,6 +61,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 button,
@@ -32,4 +70,16 @@ a {
   cursor: pointer;
 }
 
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
 
+::-webkit-scrollbar-thumb {
+  background: var(--foreground-muted);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

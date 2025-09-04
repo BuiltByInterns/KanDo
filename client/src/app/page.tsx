@@ -15,7 +15,9 @@ export default function Home() {
     if (!loading && !user) {
       router.replace("/login");
     } else if (user) {
-      router.replace("/u/" + user.displayName + "/boards");
+      if (user.displayName && user.displayName.trim() !== "") {
+        router.replace(`/u/${encodeURIComponent(user.displayName)}/boards`);
+      }
     }
   }, [loading, user, router]);
 
@@ -24,7 +26,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return null; // we’ll redirect anyway
+    return null;
   }
 
   return (

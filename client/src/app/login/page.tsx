@@ -20,9 +20,14 @@ export default function LoginPage() {
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
-  const routeToDashboard = (userName: string) => {
-    const encodedUserName = encodeURIComponent(userName);
-    router.push(`/u/${encodedUserName}/boards`);
+  const routeToDashboard = (userName: string | undefined) => {
+    if (userName && userName.trim() !== "") {
+      const encodedUserName = encodeURIComponent(userName);
+      router.push(`/u/${encodedUserName}/boards`);
+    } else {
+      // Optionally, redirect to profile setup or show error
+      // router.push("/setup-profile");
+    }
   };
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
