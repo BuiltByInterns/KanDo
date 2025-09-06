@@ -1,7 +1,6 @@
 import { db } from "@/lib/firebase";
 import { User } from "firebase/auth";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
-import { url } from "inspector";
 import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
