@@ -27,7 +27,7 @@ router.get("/boards", async (req, res) => {
   }
 });
 
-// POST /api/user/createBoard  { userId: "...", title: "..." }
+// POST /api/user/createBoard
 router.post("/createBoard", async (req, res) => {
   console.log("Received request for createBoard with body:", req.body);
   try {
@@ -53,7 +53,8 @@ router.post("/createBoard", async (req, res) => {
       members: [userId],
       pinned: false,
     };
-    const newBoardDoc = await newBoardRef.add(newBoardData);
+
+    const newBoardDoc = await db.collection("Boards").add(newBoardData);
 
     const userRef = db.collection("Users").doc(userId);
     await userRef.set(

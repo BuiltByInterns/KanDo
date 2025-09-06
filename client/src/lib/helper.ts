@@ -88,7 +88,16 @@ export async function createNewBoard(
       userId: userId,
       title: boardName || "Untitled Board",
     });
-    const res = await fetch(`${API_BASE}/api/user/createBoard?${params.toString()}`);
+    const res = await fetch(`${API_BASE}/api/user/createBoard`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        title: boardName || "Untitled Board",
+      }),
+    });
 
     if (!res.ok) throw new Error("Failed to create new board");
 
