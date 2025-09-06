@@ -1,9 +1,8 @@
 // board.js
 import express from "express";
-import { getFirestore } from "firebase-admin/firestore";
+import db from "../firebase.js";
 
 const router = express.Router();
-const db = getFirestore();
 
 // GET /api/board/:id
 router.get("/:id", async (req, res) => {
