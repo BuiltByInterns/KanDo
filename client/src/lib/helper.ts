@@ -1,15 +1,9 @@
 import { db } from "@/lib/firebase";
 import { User } from "firebase/auth";
-import {
-  doc,
-  getDoc,
-  addDoc,
-  collection,
-  updateDoc,
-  arrayUnion,
-  setDoc,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 /**
  * A helper function that checks the validity of an email address.
@@ -30,17 +24,16 @@ export function isValidEmail(email: string): boolean {
  * @param {string} userID - The ID of the user whose boards are to be retrieved.
  * @returns {Promise<string[]>} - A Promise resolving to an array of board IDs.
  */
-export async function getUserBoards(userID: string): Promise<string[]> {
+export async function getUserBoards(userId: string): Promise<string[]> {
+  console.log("Fetching boards for user:", userId);
   try {
-    const userRef = doc(db, "Users", userID);
-    const userSnap = await getDoc(userRef);
+    const res = await fetch(`${API_BASE}/api/user/boards?userId=${userId}`);
+    const boards = await res.json();
 
-    if (!userSnap.exists()) return [];
-
-    const userData = userSnap.data() as { Boards?: string[] };
-    return userData.Boards || [];
-  } catch (error) {
-    console.error("Error fetching user boards:", error);
+    if (!res.ok) throw new Error("Failed to fetch boards");
+    return boards;
+  } catch (err) {
+    console.error(err);
     return [];
   }
 }
@@ -53,15 +46,27 @@ export async function getUserBoards(userID: string): Promise<string[]> {
  * @returns {Promise<any>} - A Promise resolving to the board data or null if not found.
  */
 export async function getBoardInfo(boardId: string): Promise<any> {
+  console.log("Fetching board info for board:", boardId);
   try {
-    const boardRef = doc(db, "Boards", boardId);
-    const boardSnap = await getDoc(boardRef);
+    const res = await fetch(`${API_BASE}/api/board/${boardId}`);
 
-    if (!boardSnap.exists()) return null;
+    if (res.status === 404) {
+      console.warn(`Board ${boardId} not found, removing from recentBoards`);
+      const stored = localStorage.getItem("recentBoards");
+      if (stored) {
+        const recentBoards: string[] = JSON.parse(stored);
+        const updated = recentBoards.filter((id) => id !== boardId);
+        localStorage.setItem("recentBoards", JSON.stringify(updated));
+      }
+      return null;
+    }
 
-    return { id: boardSnap.id, ...boardSnap.data() };
-  } catch (error) {
-    console.error("Error fetching board info:", error);
+    if (!res.ok)
+      throw new Error("Failed to fetch board info for ID: " + boardId);
+
+    return await res.json();
+  } catch (err) {
+    console.error(err);
     return null;
   }
 }
@@ -77,28 +82,29 @@ export async function getBoardInfo(boardId: string): Promise<any> {
 export async function createNewBoard(
   userId: string,
   boardName: string
-): Promise<string | null> {
+): Promise<any> {
   try {
-    const boardRef = collection(db, "Boards");
-    const newBoardData = {
-      name: boardName,
-      createdAt: new Date(),
-      ownerId: userId,
-      privacy: "private",
-      members: [userId],
-      pinned: false,
-    };
-
-    const newBoard = await addDoc(boardRef, newBoardData);
-
-    const userRef = doc(db, "Users", userId);
-    await updateDoc(userRef, {
-      Boards: arrayUnion(newBoard.id),
+    const params = new URLSearchParams({
+      userId: userId,
+      title: boardName || "Untitled Board",
+    });
+    const res = await fetch(`${API_BASE}/api/user/createBoard`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        title: boardName || "Untitled Board",
+      }),
     });
 
-    return newBoard.id;
-  } catch (error) {
-    console.error("Error creating new board:", error);
+    if (!res.ok) throw new Error("Failed to create new board");
+
+    const data = await res.json();
+    return data.boardId;
+  } catch (err) {
+    console.error(err);
     return null;
   }
 }
@@ -193,6 +199,6 @@ export async function openBoard(
 
   await addRecentBoard(user.uid, id);
 
-  const boardName = encodeURIComponent(board.name || "Untitled");
+  const boardName = encodeURIComponent(board.urlName || "Untitled");
   router.push(`/b/${id}/${boardName}`);
 }
