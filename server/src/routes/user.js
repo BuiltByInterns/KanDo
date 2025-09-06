@@ -27,11 +27,11 @@ router.get("/boards", async (req, res) => {
   }
 });
 
-// GET /api/user/createBoard?userId=123&title=NewBoard
-router.get("/createBoard", async (req, res) => {
-  console.log("Received request for createBoard with query:", req.query);
+// POST /api/user/createBoard  { userId: "...", title: "..." }
+router.post("/createBoard", async (req, res) => {
+  console.log("Received request for createBoard with body:", req.body);
   try {
-    const { userId, title } = req.query;
+    const { userId, title } = req.body;
     if (!userId || !title) {
       return res.status(400).json({ error: "Missing userId or title" });
     }
