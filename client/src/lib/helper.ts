@@ -84,11 +84,11 @@ export async function createNewBoard(
   boardName: string
 ): Promise<any> {
   try {
-    const res = await fetch(
-      `${API_BASE}/api/user/createBoard?userId=${userId}&title=${
-        boardName || "Untitled Board"
-      }`
-    );
+    const params = new URLSearchParams({
+      userId: userId,
+      title: boardName || "Untitled Board",
+    });
+    const res = await fetch(`${API_BASE}/api/user/createBoard?${params.toString()}`);
 
     if (!res.ok) throw new Error("Failed to create new board");
 
