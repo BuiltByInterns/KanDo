@@ -24,7 +24,12 @@ router.get("/", async (req, res) => {
       },
     ]);
 
-    res.json(results.results[0].hits);
+    const boards = results.results[0].hits.map((hit) => ({
+      ...hit,
+      type: "board",
+    }));
+
+    res.json(boards);
   } catch (err) {
     console.error("Algolia search error:", err);
     res.status(500).json({ error: "Search failed" });

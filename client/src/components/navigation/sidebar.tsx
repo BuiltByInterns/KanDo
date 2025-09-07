@@ -221,7 +221,12 @@ export default function Sidebar({ onSignOut, userName, user }: SidebarProps) {
               label={item.label}
               href={item.href}
               icon={<Folder className="w-5 h-5" />}
-              onClick={() => openBoard(item.id, user, router)}
+              onClick={() =>
+                typeof item.id === "string" &&
+                user &&
+                "emailVerified" in user &&
+                openBoard(item.id, user as import("firebase/auth").User, router)
+              }
             />
           ))
         )}

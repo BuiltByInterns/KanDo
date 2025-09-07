@@ -2,6 +2,7 @@ import { db } from "@/lib/firebase";
 import { User } from "firebase/auth";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { commands } from "@/lib/commands";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
@@ -210,22 +211,6 @@ export async function openBoard(
  * @param {string} query - The search query string.
  * @returns {Promise<{ boards: any[]; users: any[] }>} - A Promise resolving to an object with boards and users arrays.
  */
-// not in use as havent added user search yet
-export async function globalSearch2(query: string) {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(
-        query
-      )}`
-    );
-    if (!res.ok) throw new Error("Search failed");
-    return await res.json(); // { boards: [...], users: [...] }
-  } catch (err) {
-    console.error("Search error:", err);
-    return { boards: [], users: [] };
-  }
-}
-
 export async function globalSearch(query: string) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(
@@ -233,5 +218,15 @@ export async function globalSearch(query: string) {
     )}`
   );
   if (!res.ok) throw new Error("Search failed");
-  return res.json();
+  const boards = await res.json();
+  const boardResults = boards.map((b: any) => ({
+    ...b,
+    type: "board",
+  }));
+
+  const commandResults = commands.filter((cmd) =>
+    cmd.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return [...boardResults, ...commandResults];
 }

@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { globalSearch } from "@/lib/helper";
+import { globalSearch, openBoard } from "@/lib/helper";
 
 interface SearchModalProps {
   open: boolean;
@@ -11,6 +14,20 @@ interface SearchModalProps {
 
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const [results, setResults] = useState<any[]>([]);
+  const router = useRouter();
+  const [user, loading] = useAuthState(auth);
+
+  const handlers: Record<string, (item: any) => void> = {
+    board: (board) => {
+      console.log("Open board:", board.objectID);
+      if (user) {
+        openBoard(board.objectID, user, router);
+      }
+    },
+    command: (cmd) => {
+      cmd.action();
+    },
+  };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -77,6 +94,10 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
               <div
                 key={item.objectID || item.id}
                 className="p-2 rounded hover:bg-gray-700 cursor-pointer"
+                onClick={() => {
+                  handlers[item.type]?.(item);
+                  onClose();
+                }}
               >
                 {item.name || item.displayName || "Untitled"}
               </div>

@@ -1,8 +1,16 @@
+import "dotenv/config";
 import express from "express";
 import { db } from "../firebase.js";
 import admin from "firebase-admin";
+import { algoliasearch } from "algoliasearch";
 
 const router = express.Router();
+
+const client = algoliasearch(
+  process.env.ALGOLIA_APP_ID,
+  process.env.ALGOLIA_WRITE_API_KEY
+);
+const boardIndexName = "boards";
 
 // GET /api/user/boards?userId=123
 router.get("/boards", async (req, res) => {
@@ -63,6 +71,16 @@ router.post("/createBoard", async (req, res) => {
       },
       { merge: true }
     );
+
+    await client.saveObjects({
+      indexName: boardIndexName,
+      objects: [
+        {
+          objectID: newBoardDoc.id, // required
+          ...newBoardData,
+        },
+      ],
+    });
 
     res.json({ boardId: newBoardDoc.id });
   } catch (err) {
