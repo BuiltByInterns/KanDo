@@ -202,3 +202,36 @@ export async function openBoard(
   const boardName = encodeURIComponent(board.urlName || "Untitled");
   router.push(`/b/${id}/${boardName}`);
 }
+
+/** A helper function that performs a global search for boards and users based on a query string.
+ * It sends a GET request to the /api/search endpoint with the query as a URL parameter.
+ * Returns an object containing arrays of matching boards and users.
+ *
+ * @param {string} query - The search query string.
+ * @returns {Promise<{ boards: any[]; users: any[] }>} - A Promise resolving to an object with boards and users arrays.
+ */
+// not in use as havent added user search yet
+export async function globalSearch2(query: string) {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(
+        query
+      )}`
+    );
+    if (!res.ok) throw new Error("Search failed");
+    return await res.json(); // { boards: [...], users: [...] }
+  } catch (err) {
+    console.error("Search error:", err);
+    return { boards: [], users: [] };
+  }
+}
+
+export async function globalSearch(query: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(
+      query
+    )}`
+  );
+  if (!res.ok) throw new Error("Search failed");
+  return res.json();
+}

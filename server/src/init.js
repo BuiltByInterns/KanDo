@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import userRoutes from "./routes/user.js";
 import boardRoutes from "./routes/board.js";
+import searchRoutes from "./routes/search.js";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL }));
 
 app.use("/api/user", userRoutes);
 app.use("/api/board", boardRoutes);
+app.use("/api/search", searchRoutes);
 
 const port = process.env.PORT || 5050;
 app.listen(port, () => {

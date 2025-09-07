@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { globalSearch } from "@/lib/helper";
 
 interface SearchModalProps {
   open: boolean;
@@ -9,6 +10,8 @@ interface SearchModalProps {
 }
 
 export default function SearchModal({ open, onClose }: SearchModalProps) {
+  const [results, setResults] = useState<any[]>([]);
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -16,6 +19,33 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
+
+  useEffect(() => {
+    const input = document.querySelector(
+      'input[placeholder="Type to search..."]'
+    ) as HTMLInputElement;
+
+    if (!input) return;
+
+    const handleInput = async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const query = target.value.trim();
+
+      if (query !== "") {
+        try {
+          const searchResults = await globalSearch(query);
+          setResults(searchResults);
+        } catch (err) {
+          console.error("Search error:", err);
+        }
+      } else {
+        setResults([]);
+      }
+    };
+
+    input.addEventListener("input", handleInput);
+    return () => input.removeEventListener("input", handleInput);
+  }, [open]);
 
   if (!open) return null;
 
@@ -40,6 +70,21 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
           placeholder="Type to search..."
           className="w-full px-4 py-2 rounded-md bg-background-alt text-gray-200 border border-border focus:outline-none focus:border-accent"
         />
+
+        <div className="mt-4 max-h-64 overflow-y-auto">
+          {results.length > 0 ? (
+            results.map((item) => (
+              <div
+                key={item.objectID || item.id}
+                className="p-2 rounded hover:bg-gray-700 cursor-pointer"
+              >
+                {item.name || item.displayName || "Untitled"}
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400">No results found</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-// board.js
 import express from "express";
 import { db } from "../firebase.js";
 
