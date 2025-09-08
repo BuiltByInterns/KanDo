@@ -6,6 +6,23 @@ import { commands } from "@/lib/commands";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
+type Board = {
+  objectID: string;
+  name: string;
+  urlName: string;
+  ownerId: string;
+  members: string[];
+  privacy: string;
+  pinned: boolean;
+  createdAt: any;
+};
+
+type UserBoardsResponse = {
+  owned: Board[];
+  shared: Board[];
+  pinned: string[];
+};
+
 /**
  * A helper function that checks the validity of an email address.
  * It uses a regular expression to validate the format of the email.
@@ -25,17 +42,20 @@ export function isValidEmail(email: string): boolean {
  * @param {string} userID - The ID of the user whose boards are to be retrieved.
  * @returns {Promise<string[]>} - A Promise resolving to an array of board IDs.
  */
-export async function getUserBoards(userId: string): Promise<string[]> {
+export async function getUserBoards(
+  userId: string
+): Promise<UserBoardsResponse> {
   console.log("Fetching boards for user:", userId);
   try {
     const res = await fetch(`${API_BASE}/api/user/boards?userId=${userId}`);
     const boards = await res.json();
 
     if (!res.ok) throw new Error("Failed to fetch boards");
-    return boards;
+
+    return boards as UserBoardsResponse;
   } catch (err) {
     console.error(err);
-    return [];
+    return { owned: [], shared: [], pinned: [] };
   }
 }
 
@@ -115,16 +135,29 @@ export async function createNewBoard(
  * If the board is already pinned, it unpins it by setting pinned to false.
  *
  * @param {string} boardId - The ID of the board to pin or unpin.
- * @param {boolean} pinStatus - The desired pinned state (true to pin, false to unpin).
+ * @param {string} userId - The ID of the user performing the action.
+ * @returns {Promise<boolean>} - A Promise of the pin status.
  */
 export async function pinBoard(
-  boardId: string,
-  pinStatus: boolean
-): Promise<void> {
-  const boardRef = doc(db, "Boards", boardId);
-  await updateDoc(boardRef, {
-    pinned: pinStatus,
-  });
+  userId: string,
+  boardId: string
+): Promise<boolean> {
+  try {
+    const params = new URLSearchParams({
+      userId,
+      boardId,
+    });
+    const res = await fetch(
+      `${API_BASE}/api/user/pinBoard?${params.toString()}`
+    );
+    if (!res.ok) throw new Error("Failed to pin/unpin board");
+    const data = await res.json();
+    console.log("Pin/unpin response:", data);
+    return data.pinned;
+  } catch (error) {
+    console.error("Error pinning/unpinning board:", error);
+    return false;
+  }
 }
 
 /**
