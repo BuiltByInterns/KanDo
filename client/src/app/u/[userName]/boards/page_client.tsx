@@ -33,6 +33,9 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
   >([]);
   const [addingBoard, setAddingBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState("");
+  const [ownedBoards, setOwnedBoards] = useState<any[]>([]);
+  const [sharedBoards, setSharedBoards] = useState<any[]>([]);
+  const [pinnedBoards, setPinnedBoards] = useState<any[]>([]);
 
   function redirectToUserBoards(
     user: User,
@@ -85,14 +88,36 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
   useEffect(() => {
     const fetchBoards = async () => {
       if (!user) return;
-      const boardIds = await getUserBoards(user.uid);
-      const boardsData = await Promise.all(
-        boardIds.map((id) => getBoardInfo(id))
+
+      const { owned, shared, pinned } = await getUserBoards(user.uid);
+
+      const pinnedSet = new Set(pinned);
+
+      const ownedData = await Promise.all(
+        owned.map((board) => getBoardInfo(board.objectID))
       );
-      setBoardList(
-        boardsData.filter(Boolean) as { id: string; name?: string }[]
+      const sharedData = await Promise.all(
+        shared.map((board) => getBoardInfo(board.objectID))
       );
+
+      const ownedWithPins = ownedData
+        .filter(Boolean)
+        .map((b) => ({ ...b, pinned: pinnedSet.has(b.id) }));
+
+      const sharedWithPins = sharedData
+        .filter(Boolean)
+        .map((b) => ({ ...b, pinned: pinnedSet.has(b.id) }));
+
+      const pinnedData = [...ownedWithPins, ...sharedWithPins].filter(
+        (b) => b.pinned
+      );
+
+      setOwnedBoards(ownedWithPins);
+      setSharedBoards(sharedWithPins);
+      setPinnedBoards(pinnedData);
+
     };
+
     fetchBoards();
   }, [user]);
 
@@ -111,11 +136,48 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
     }
   };
 
-  const togglePinBoard = (id: string) => {
-    setBoardList((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, pinned: !b.pinned } : b))
+  const togglePinBoard = async (id: string) => {
+    if (!user?.uid) return;
+    const isPinned = pinnedBoards.some((b) => b.id === id);
+
+    if (isPinned) {
+      setPinnedBoards((prev) => prev.filter((b) => b.id !== id));
+    } else {
+      const board =
+        ownedBoards.find((b) => b.id === id) ||
+        sharedBoards.find((b) => b.id === id);
+      if (board)
+        setPinnedBoards((prev) => [...prev, { ...board, pinned: true }]);
+    }
+
+    setOwnedBoards((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, pinned: !isPinned } : b))
     );
-    pinBoard(id, !boardList.find((b) => b.id === id)?.pinned);
+    setSharedBoards((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, pinned: !isPinned } : b))
+    );
+
+    const newStatus = await pinBoard(user.uid, id);
+
+    if (newStatus !== !isPinned) {
+      console.warn("Backend disagreed, rolling back");
+
+      setOwnedBoards((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, pinned: isPinned } : b))
+      );
+      setSharedBoards((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, pinned: isPinned } : b))
+      );
+
+      if (isPinned) {
+        const board =
+          ownedBoards.find((b) => b.id === id) ||
+          sharedBoards.find((b) => b.id === id);
+        if (board) setPinnedBoards((prev) => [...prev, board]);
+      } else {
+        setPinnedBoards((prev) => prev.filter((b) => b.id !== id));
+      }
+    }
   };
 
   return (
@@ -155,21 +217,17 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
               Starred Boards
             </h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
-              {boardList.filter((b) => b.pinned).length === 0 ? (
+              {pinnedBoards.length === 0 ? (
                 <p className="text-gray-400">No starred boards.</p>
               ) : (
-                boardList
-                  .filter((b) => b.pinned)
-                  .map((board) => (
-                    <BoardCard
-                      key={board.id}
-                      board={board}
-                      togglePin={togglePinBoard}
-                      openBoard={() =>
-                        user && openBoard(board.id, user, router)
-                      }
-                    />
-                  ))
+                pinnedBoards.map((board) => (
+                  <BoardCard
+                    key={board.id}
+                    board={board}
+                    togglePin={togglePinBoard}
+                    openBoard={() => user && openBoard(board.id, user, router)}
+                  />
+                ))
               )}
             </div>
           </section>
@@ -180,10 +238,10 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
               My Boards
             </h2>
             <div className="flex gap-4 flex-wrap">
-              {boardList.length === 0 ? (
+              {ownedBoards.length === 0 ? (
                 <p className="text-gray-400">No boards yet.</p>
               ) : (
-                boardList.map((board) => (
+                ownedBoards.map((board) => (
                   <BoardCard
                     key={board.id}
                     board={board}
@@ -232,21 +290,17 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
               Shared with You
             </h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
-              {boardList.filter((b) => b.pinned).length === 0 ? (
-                <p className="text-gray-400">No pinned boards.</p>
+              {sharedBoards.length === 0 ? (
+                <p className="text-gray-400">No shared boards.</p>
               ) : (
-                boardList
-                  .filter((b) => b.pinned)
-                  .map((board) => (
-                    <BoardCard
-                      key={board.id}
-                      board={board}
-                      togglePin={togglePinBoard}
-                      openBoard={() =>
-                        user && openBoard(board.id, user, router)
-                      }
-                    />
-                  ))
+                sharedBoards.map((board) => (
+                  <BoardCard
+                    key={board.id}
+                    board={board}
+                    togglePin={togglePinBoard}
+                    openBoard={() => user && openBoard(board.id, user, router)}
+                  />
+                ))
               )}
             </div>
           </section>

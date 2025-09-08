@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "algoliasearch": "^5.37.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
@@ -13,7 +14,8 @@
   "main": "src/init.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon ."
+    "dev": "nodemon .",
+    "algolia:backfill": "node src/scripts/backfillAlgolia.js"
   },
   "keywords": [],
   "author": "",

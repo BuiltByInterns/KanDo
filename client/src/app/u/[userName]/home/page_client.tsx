@@ -36,13 +36,27 @@ export default function HomePage({ userName }: HomePageProps) {
   useEffect(() => {
     const fetchBoards = async () => {
       if (!user) return;
-      const boardIds = await getUserBoards(user.uid);
-      const boardsData = await Promise.all(
-        boardIds.map((id) => getBoardInfo(id))
+      const { owned, shared, pinned } = await getUserBoards(user.uid);
+
+      const pinnedSet = new Set(pinned);
+
+      const ownedData = await Promise.all(
+        owned.map((board) => getBoardInfo(board.objectID))
       );
-      setBoardList(
-        boardsData.filter(Boolean) as { id: string; name?: string }[]
+      const sharedData = await Promise.all(
+        shared.map((board) => getBoardInfo(board.objectID))
       );
+
+      const ownedWithPins = ownedData
+        .filter(Boolean)
+        .map((b) => ({ ...b, pinned: pinnedSet.has(b.id) }));
+      const sharedWithPins = sharedData
+        .filter(Boolean)
+        .map((b) => ({ ...b, pinned: pinnedSet.has(b.id) }));
+      const pinnedData = [...ownedWithPins, ...sharedWithPins].filter(
+        (b) => b.pinned
+      );
+      setBoardList(pinnedData);
     };
     fetchBoards();
   }, [user]);

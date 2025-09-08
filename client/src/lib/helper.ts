@@ -2,8 +2,26 @@ import { db } from "@/lib/firebase";
 import { User } from "firebase/auth";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { commands } from "@/lib/commands";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+
+type Board = {
+  objectID: string;
+  name: string;
+  urlName: string;
+  ownerId: string;
+  members: string[];
+  privacy: string;
+  pinned: boolean;
+  createdAt: any;
+};
+
+type UserBoardsResponse = {
+  owned: Board[];
+  shared: Board[];
+  pinned: string[];
+};
 
 /**
  * A helper function that checks the validity of an email address.
@@ -24,17 +42,20 @@ export function isValidEmail(email: string): boolean {
  * @param {string} userID - The ID of the user whose boards are to be retrieved.
  * @returns {Promise<string[]>} - A Promise resolving to an array of board IDs.
  */
-export async function getUserBoards(userId: string): Promise<string[]> {
+export async function getUserBoards(
+  userId: string
+): Promise<UserBoardsResponse> {
   console.log("Fetching boards for user:", userId);
   try {
     const res = await fetch(`${API_BASE}/api/user/boards?userId=${userId}`);
     const boards = await res.json();
 
     if (!res.ok) throw new Error("Failed to fetch boards");
-    return boards;
+
+    return boards as UserBoardsResponse;
   } catch (err) {
     console.error(err);
-    return [];
+    return { owned: [], shared: [], pinned: [] };
   }
 }
 
@@ -114,16 +135,29 @@ export async function createNewBoard(
  * If the board is already pinned, it unpins it by setting pinned to false.
  *
  * @param {string} boardId - The ID of the board to pin or unpin.
- * @param {boolean} pinStatus - The desired pinned state (true to pin, false to unpin).
+ * @param {string} userId - The ID of the user performing the action.
+ * @returns {Promise<boolean>} - A Promise of the pin status.
  */
 export async function pinBoard(
-  boardId: string,
-  pinStatus: boolean
-): Promise<void> {
-  const boardRef = doc(db, "Boards", boardId);
-  await updateDoc(boardRef, {
-    pinned: pinStatus,
-  });
+  userId: string,
+  boardId: string
+): Promise<boolean> {
+  try {
+    const params = new URLSearchParams({
+      userId,
+      boardId,
+    });
+    const res = await fetch(
+      `${API_BASE}/api/user/pinBoard?${params.toString()}`
+    );
+    if (!res.ok) throw new Error("Failed to pin/unpin board");
+    const data = await res.json();
+    console.log("Pin/unpin response:", data);
+    return data.pinned;
+  } catch (error) {
+    console.error("Error pinning/unpinning board:", error);
+    return false;
+  }
 }
 
 /**
@@ -201,4 +235,31 @@ export async function openBoard(
 
   const boardName = encodeURIComponent(board.urlName || "Untitled");
   router.push(`/b/${id}/${boardName}`);
+}
+
+/** A helper function that performs a global search for boards and users based on a query string.
+ * It sends a GET request to the /api/search endpoint with the query as a URL parameter.
+ * Returns an object containing arrays of matching boards and users.
+ *
+ * @param {string} query - The search query string.
+ * @returns {Promise<{ boards: any[]; users: any[] }>} - A Promise resolving to an object with boards and users arrays.
+ */
+export async function globalSearch(query: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(
+      query
+    )}`
+  );
+  if (!res.ok) throw new Error("Search failed");
+  const boards = await res.json();
+  const boardResults = boards.map((b: any) => ({
+    ...b,
+    type: "board",
+  }));
+
+  const commandResults = commands.filter((cmd) =>
+    cmd.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return [...boardResults, ...commandResults];
 }
