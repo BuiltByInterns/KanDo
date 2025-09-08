@@ -116,7 +116,6 @@ export default function DashboardPage({ userName }: DashboardPageProps) {
       setSharedBoards(sharedWithPins);
       setPinnedBoards(pinnedData);
 
-      console.log({ ownedWithPins, sharedWithPins, pinnedData });
     };
 
     fetchBoards();
