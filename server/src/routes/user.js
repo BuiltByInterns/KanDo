@@ -73,7 +73,7 @@ router.get("/boards", async (req, res) => {
 router.get("/pinBoard", async (req, res) => {
   console.log("Received request for pinBoard with query:", req.query);
   try {
-    const { userId, boardId, pin } = req.query;
+    const { userId, boardId } = req.query;
 
     const userRef = db.collection("Users").doc(userId);
     const userSnap = await userRef.get();
