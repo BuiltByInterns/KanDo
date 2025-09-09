@@ -102,13 +102,18 @@ export async function getBoardInfo(boardId: string): Promise<any> {
  */
 export async function createNewBoard(
   userId: string,
-  boardName: string
+  boardName: string,
+  privacy: "private" | "public",
+  banner: { type: "preset" | "color" | "upload"; value: string } | null
 ): Promise<any> {
   try {
     const params = new URLSearchParams({
       userId: userId,
       title: boardName || "Untitled Board",
+      privacy: privacy,
+      banner: banner ? JSON.stringify(banner) : "",
     });
+    console.log("Creating board with params:", params.toString());
     const res = await fetch(`${API_BASE}/api/user/createBoard`, {
       method: "POST",
       headers: {
@@ -117,6 +122,8 @@ export async function createNewBoard(
       body: JSON.stringify({
         userId,
         title: boardName || "Untitled Board",
+        privacy,
+        background: banner,
       }),
     });
 
@@ -257,7 +264,7 @@ export async function globalSearch(query: string) {
     type: "board",
   }));
 
-  const commandResults = commands.filter((cmd) =>
+  const commandResults = commands.filter((cmd: { name: string }) =>
     cmd.name.toLowerCase().includes(query.toLowerCase())
   );
 

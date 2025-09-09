@@ -10,23 +10,25 @@ import { globalSearch, openBoard } from "@/lib/helper";
 interface SearchModalProps {
   open: boolean;
   onClose: () => void;
+  commandActions?: {
+    openBoardModal: () => void;
+    openInviteModal: () => void;
+    [key: string]: () => void;
+  };
 }
 
-export default function SearchModal({ open, onClose }: SearchModalProps) {
+export default function SearchModal({
+  open,
+  onClose,
+  commandActions,
+}: SearchModalProps) {
   const [results, setResults] = useState<any[]>([]);
   const router = useRouter();
   const [user, loading] = useAuthState(auth);
 
   const handlers: Record<string, (item: any) => void> = {
-    board: (board) => {
-      console.log("Open board:", board.objectID);
-      if (user) {
-        openBoard(board.objectID, user, router);
-      }
-    },
-    command: (cmd) => {
-      cmd.action();
-    },
+    board: (board) => user && openBoard(board.objectID, user, router),
+    command: (cmd) => cmd.action(),
   };
 
   useEffect(() => {
