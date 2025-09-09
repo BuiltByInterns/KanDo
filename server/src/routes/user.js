@@ -106,7 +106,7 @@ router.post("/createBoard", async (req, res) => {
   console.log("Received request for createBoard with body:", req.body);
   try {
     const { userId, title, privacy, background } = req.body;
-    if (!userId || !title || !privacy || !background) {
+    if (!userId || !title || !privacy || typeof background === "undefined") {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
