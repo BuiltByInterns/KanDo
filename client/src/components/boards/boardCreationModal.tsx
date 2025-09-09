@@ -181,20 +181,6 @@ export default function BoardCreationModal({
           </div>
         </div>
 
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              const url = URL.createObjectURL(file);
-              setBanner({ type: "upload", value: url });
-            }
-          }}
-        />
-
         <p className="text-sm mb-2 font-medium">Board Name</p>
         <input
           type="text"
