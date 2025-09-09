@@ -7,6 +7,10 @@ interface BoardCardProps {
     id: string;
     name?: string;
     pinned?: boolean;
+    background?: {
+      type: "color" | "preset" | "upload";
+      value: string;
+    };
   };
   togglePin: (id: string) => void;
   openBoard: (id: string) => void;
@@ -46,12 +50,27 @@ export default function BoardCard({
         )}
       </button>
 
-      <div className="h-2/3 relative w-full">
-        <img
-          src={board.backgroundId || "/default-board.jpg"}
-          alt={board.name || "Board preview"}
-          className="absolute inset-0 w-full h-full object-cover rounded-t-xl"
-        />
+      <div className="h-2/3 relative w-full rounded-t-xl overflow-hidden">
+        {board.background ? (
+          board.background.type === "color" ? (
+            <div
+              className="absolute inset-0"
+              style={{ background: board.background.value }}
+            />
+          ) : (
+            <img
+              src={board.background.value}
+              alt={board.name || "Board preview"}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )
+        ) : (
+          <img
+            src="/default-board.jpg"
+            alt={board.name || "Board preview"}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
       </div>
 
       <div className="h-1/3 flex px-3 pb-3 items-end">

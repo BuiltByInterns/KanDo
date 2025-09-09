@@ -105,9 +105,9 @@ router.get("/pinBoard", async (req, res) => {
 router.post("/createBoard", async (req, res) => {
   console.log("Received request for createBoard with body:", req.body);
   try {
-    const { userId, title } = req.body;
-    if (!userId || !title) {
-      return res.status(400).json({ error: "Missing userId or title" });
+    const { userId, title, privacy, background } = req.body;
+    if (!userId || !title || !privacy || !background) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     const normalisedName = title.trim().substring(0, 50);
@@ -117,14 +117,14 @@ router.post("/createBoard", async (req, res) => {
       .replace(/^-+|-+$/g, "")
       .substring(0, 50);
 
-    const newBoardRef = db.collection("Boards");
     const newBoardData = {
       name: normalisedName,
       urlName: urlName,
       createdAt: new Date(),
       ownerId: userId,
-      privacy: "private",
+      privacy: privacy,
       members: [userId],
+      background: background,
     };
 
     const newBoardDoc = await db.collection("Boards").add(newBoardData);
